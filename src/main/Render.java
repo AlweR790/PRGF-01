@@ -35,23 +35,57 @@ public class Render
                 img.setRGB(x, y, color);
             }
 
-        public void drawLine(int x1, int y1, int x2, int y2, int color)
+        public void drawLine(Point first, Point second, int color)
             {
-                if (x2 - x1 < 0)
+                if(first.equals(second))
                     {
-                        int temp = x1;
-                        x1 = x2;
-                        x2 = temp;
-                        temp = y1;
-                        y1 = y2;
-                        y2 = temp;
+                        drawPixel((int)first.getX(), (int)first.getY(), color);
+                        return;
                     }
-                float k = (float) (x2 - x1) / (y2 - y1);
-                float q = y1 - k * x1;
-                for (int x = x1; x > x2; x++)
+                float k = (second.getY() - first.getY()) / (second.getX() - first.getX());
+                float q = first.getY() - k * first.getX();
+                if(Math.abs(k) >= 1)
                     {
-                        float y = k * x + q;
-                        drawPixel(x, Math.round(y), color);
+                        if(first.getY() > second.getY())
+                            {
+                                Point temp = first;
+                                first = second;
+                                second = temp;
+                            }
+
+                        k = (second.getX() - first.getX()) / (second.getY() - first.getY());
+                        q = first.getX() - k* first.getY();
+                        for (float y = first.getY(); y <= second.getY() ; y++)
+                            {
+                                float x = k*y+q;
+                                if(x > 1600 || x<0)
+                                    return;
+                                drawPixel(Math.round(x), (int)y, color );
+                                System.out.println(y);
+                            }
+                    }
+                else
+                    {
+                        if(first.getX()> second.getX())
+                            {
+                                Point temp = first;
+                                first = second;
+                                second = temp;
+                            }
+                        for (float x = first.getX(); x <= second.getX(); x++)
+                            {
+                                float y = k * x + q;
+                                if(y > 900 || y < 0)
+                                    return;
+                                drawPixel((int)x, Math.round(y), color);
+                                System.out.println(y);
+                            }
                     }
             }
+        public void clear() {
+            Graphics g = img.getGraphics();
+            g.setColor(Color.BLACK);
+            g.clearRect(0, 0, 1600, 900);
+        }
+
     }
