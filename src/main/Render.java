@@ -9,7 +9,7 @@ public class Render
     {
         private BufferedImage img;
         private Canvas canvas;
-        private static final int FPS = 1000 / 30;
+        private static final int FPS  = 1000 / 100;
 
         public Render(BufferedImage img, Canvas canvas)
             {
@@ -58,10 +58,8 @@ public class Render
                         for (float y = first.getY(); y <= second.getY() ; y++)
                             {
                                 float x = k*y+q;
-                                if(x > 1600 || x<0)
-                                    return;
-                                drawPixel(Math.round(x), (int)y, color );
-                                System.out.println(y);
+                                if(x < 1600 && x>0  && y > 0 && y<900)
+                                    drawPixel(Math.round(x), (int)y, color );
                             }
                     }
                 else
@@ -75,9 +73,8 @@ public class Render
                         for (float x = first.getX(); x <= second.getX(); x++)
                             {
                                 float y = k * x + q;
-                                if(y > 900 || y < 0)
-                                    return;
-                                drawPixel((int)x, Math.round(y), color);
+                                if(x < 1600 && x>0  && y > 0 && y<900)
+                                   drawPixel((int)x, Math.round(y), color);
                                 System.out.println(y);
                             }
                     }
