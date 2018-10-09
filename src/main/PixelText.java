@@ -43,6 +43,7 @@ public class PixelText
                                                 first.setY(mouseEvent.getY());
                                                 first.setX(mouseEvent.getX());
                                                 firstPoint = false;
+                                                render.drawPixel((int)first.getX(), (int)first.getY(), 0x00ff00);
                                             }
                                     }
                             });

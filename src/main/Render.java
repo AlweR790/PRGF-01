@@ -9,7 +9,7 @@ public class Render
     {
         private BufferedImage img;
         private Canvas canvas;
-        private static final int FPS  = 1000 / 100;
+        private static final int FPS  = 1000 / 144;
 
         public Render(BufferedImage img, Canvas canvas)
             {
