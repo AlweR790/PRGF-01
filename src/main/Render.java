@@ -90,4 +90,58 @@ public class Render
             g.clearRect(0, 0, 1600, 900);
         }
 
+        public void drawDDALine(Point start, Point end, int color)
+            {
+                int x;
+                float k, q, y;
+                k = (end.getY() - start.getY()) / (end.getX()-start.getX());
+                if(Math.abs(k) >= 1)
+                    {
+                        float x1;
+                        q = 1/k;
+                        x1 = start.getX();
+                        y = (int) start.getY();
+
+                        if(y> end.getY())
+                            {
+                                int temp = (int)x1;
+                                x1= end.getX();
+                                end.setX(temp);
+                                temp = (int) y;
+                                y = (int) end.getY();
+                                end.setY(temp);
+                            }
+                        do
+                            {
+                                drawPixel(Math.round(x1), (int)y, 0x00ffff);
+                                y+=1; x1+=q;
+                            }
+                        while (y<end.getY());
+
+                    }
+                else
+                    {
+                        k = (end.getY() - start.getY()) / (end.getX()-start.getX());
+                        x = (int)start.getX();
+                        y = (int)start.getY();
+                        if (x > end.getX())
+                            {
+                                int temp = x;
+                                x = (int) end.getX();
+                                end.setX(temp);
+                                temp = (int) y;
+                                y = (int) end.getY();
+                                end.setY(temp);
+                            }
+
+                        do
+                            {
+                                drawPixel(x, Math.round(y), 0x00ffff);
+                                x += 1;
+                                y += k;
+                            } while (x < end.getX());
+                    }
+
+            }
+
     }

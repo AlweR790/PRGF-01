@@ -57,7 +57,7 @@ public class PixelText
                                         render.clear();
                                         second.setX(e.getX());
                                         second.setY(e.getY());
-                                        render.drawLine(first, second, 0x00ffff);
+                                        render.drawDDALine(first, second, 0x00ffff);
                                     }
                             }
                     });
