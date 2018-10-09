@@ -12,6 +12,10 @@ public class PixelText
         private Canvas canvas;
         private BufferedImage img;
         private Render render;
+        private Point first = new Point();
+        private Point second = new Point();
+        private boolean firstPoint = true;
+
 
         public PixelText()
             {
@@ -20,33 +24,40 @@ public class PixelText
                 window.setSize(1600, 900);
                 window.setTitle("PRGF Cviceni");
                 window.setLocationRelativeTo(null);
-                img = new BufferedImage(1600, 900, BufferedImage.TYPE_INT_RGB);
+                img = new BufferedImage(1601, 901, BufferedImage.TYPE_INT_RGB);
                 canvas = new Canvas();
                 render = new Render(img, canvas);
                 window.add(canvas);
                 window.setVisible(true);
 
 
-                /*canvas.addMouseListener(
+
+                canvas.addMouseListener(
                         new MouseAdapter()
                             {
                                 @Override
                                 public void mouseClicked(MouseEvent mouseEvent)
                                     {
-                                        render.drawPixel(mouseEvent.getX(), mouseEvent.getY(), Color.WHITE.getRGB());
+                                        if(firstPoint)
+                                            {
+                                                first.setY(mouseEvent.getY());
+                                                first.setX(mouseEvent.getX());
+                                                firstPoint = false;
+                                            }
                                     }
-                            });*/
-                Point p1 = new Point(800,450);
+                            });
                 canvas.addMouseMotionListener(new MouseAdapter()
                     {
                         @Override
                         public void mouseDragged(MouseEvent e)
                             {
-                                render.clear();
-
-                                Point p2 = new Point(e.getX(), e.getY());
-                                System.out.println("Call");
-                                render.drawLine(p1, p2, 0x00ffff);
+                                if(!firstPoint)
+                                    {
+                                        render.clear();
+                                        second.setX(e.getX());
+                                        second.setY(e.getY());
+                                        render.drawLine(first, second, 0x00ffff);
+                                    }
                             }
                     });
             }

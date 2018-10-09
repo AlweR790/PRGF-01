@@ -59,7 +59,10 @@ public class Render
                             {
                                 float x = k*y+q;
                                 if(x < 1600 && x>0  && y > 0 && y<900)
-                                    drawPixel(Math.round(x), (int)y, color );
+                                    {
+                                        drawPixel(Math.round(x), (int) y, color);
+                                        System.out.println(x + "  :  " + y);
+                                    }
                             }
                     }
                 else
@@ -74,8 +77,10 @@ public class Render
                             {
                                 float y = k * x + q;
                                 if(x < 1600 && x>0  && y > 0 && y<900)
-                                   drawPixel((int)x, Math.round(y), color);
-                                System.out.println(y);
+                                    {
+                                        drawPixel((int)x, Math.round(y), color);
+                                        System.out.println(x + "  :  " + y);
+                                    }
                             }
                     }
             }
