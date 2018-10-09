@@ -2,6 +2,7 @@ package main;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -9,7 +10,7 @@ public class Render
     {
         private BufferedImage img;
         private Canvas canvas;
-        private static final int FPS  = 1000 / 144;
+        private static final int FPS  = 1000 / 30;
 
         public Render(BufferedImage img, Canvas canvas)
             {
@@ -61,7 +62,6 @@ public class Render
                                 if(x < 1600 && x>0  && y > 0 && y<900)
                                     {
                                         drawPixel(Math.round(x), (int) y, color);
-                                        System.out.println(x + "  :  " + y);
                                     }
                             }
                     }
@@ -79,7 +79,6 @@ public class Render
                                 if(x < 1600 && x>0  && y > 0 && y<900)
                                     {
                                         drawPixel((int)x, Math.round(y), color);
-                                        System.out.println(x + "  :  " + y);
                                     }
                             }
                     }
@@ -89,6 +88,25 @@ public class Render
             g.setColor(Color.BLACK);
             g.clearRect(0, 0, 1600, 900);
         }
+
+
+        public void drawIPolygon(List<Point> points)
+            {
+                System.out.println(points.get(points.size()-1).toString() + " to " + points.get(0).toString());
+                for(int i = 0; i < points.size()-1; i++)
+                    {
+                        System.out.println(points.get(i).toString()+ "  " + i);
+                        Point p1 = new Point(points.get(i).getX(), points.get(i).getY());
+                        Point p2 = new Point(points.get(i+1).getX(), points.get(i+1).getY());
+                        drawDDALine(p1,p2, 0xFFFFFF);
+                    }
+                    if(points.size()>1)
+                        {
+                           drawDDALine(points.get(points.size()-1), points.get(0), 0xFFFFFF);
+                        }
+                System.out.println("____________");
+            }
+
 
         public void drawDDALine(Point start, Point end, int color)
             {
@@ -113,7 +131,7 @@ public class Render
                             }
                         do
                             {
-                                drawPixel(Math.round(x1), (int)y, 0x00ffff);
+                                drawPixel(Math.round(x1), (int)y, color);
                                 y+=1; x1+=q;
                             }
                         while (y<end.getY());
@@ -136,7 +154,7 @@ public class Render
 
                         do
                             {
-                                drawPixel(x, Math.round(y), 0x00ffff);
+                                drawPixel(x, Math.round(y), color);
                                 x += 1;
                                 y += k;
                             } while (x < end.getX());

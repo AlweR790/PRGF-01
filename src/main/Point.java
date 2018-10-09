@@ -43,4 +43,13 @@ public class Point
             {
                 return (X == p2.getX() && Y == p2.getY());
             }
+
+        @Override
+        public String toString()
+            {
+                return "Point{" +
+                        "X=" + X +
+                        ", Y=" + Y +
+                        '}';
+            }
     }

@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PixelText
     {
@@ -12,10 +14,8 @@ public class PixelText
         private Canvas canvas;
         private BufferedImage img;
         private Render render;
-        private Point first = new Point();
-        private Point second = new Point();
-        private boolean firstPoint = true;
-
+        private boolean active = false;
+        private List<Point> points = new ArrayList<>();
 
         public PixelText()
             {
@@ -29,41 +29,31 @@ public class PixelText
                 render = new Render(img, canvas);
                 window.add(canvas);
                 window.setVisible(true);
+                System.out.println("OK");
 
-
-
-                canvas.addMouseListener(
-                        new MouseAdapter()
+                canvas.addMouseListener(new MouseAdapter()
                             {
                                 @Override
                                 public void mouseClicked(MouseEvent mouseEvent)
-                                    {
-                                        if(firstPoint)
-                                            {
-                                                first.setY(mouseEvent.getY());
-                                                first.setX(mouseEvent.getX());
-                                                firstPoint = false;
-                                                render.drawPixel((int)first.getX(), (int)first.getY(), 0x00ff00);
-                                            }
-                                    }
+									{
+										Point p = new Point(mouseEvent.getX(), mouseEvent.getY());
+										render.drawPixel((int)p.getX(), (int)p.getY(), Color.WHITE.getRGB());
+										points.add(p);
+										render.drawIPolygon(points);
+									}
                             });
                 canvas.addMouseMotionListener(new MouseAdapter()
                     {
                         @Override
                         public void mouseDragged(MouseEvent e)
                             {
-                                if(!firstPoint)
-                                    {
-                                        render.clear();
-                                        second.setX(e.getX());
-                                        second.setY(e.getY());
-                                        render.drawDDALine(first, second, 0x00ffff);
-                                    }
+
                             }
                     });
             }
         public static void main(String[] args)
             {
-                SwingUtilities.invokeLater(PixelText::new);
+                //SwingUtilities.invokeLater(PixelText::new);
+				new PixelText();
             }
     }
