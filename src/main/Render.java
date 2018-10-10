@@ -10,7 +10,7 @@ public class Render
     {
         private BufferedImage img;
         private Canvas canvas;
-        private static final int FPS  = 1000 / 30;
+        private static final int FPS  = 1000 / 100;
 
         public Render(BufferedImage img, Canvas canvas)
             {
@@ -90,21 +90,17 @@ public class Render
         }
 
 
-        public void drawIPolygon(List<Point> points)
+        public void drawPolygon(List<Point> points)
             {
-                System.out.println(points.get(points.size()-1).toString() + " to " + points.get(0).toString());
+                clear();
+
                 for(int i = 0; i < points.size()-1; i++)
                     {
-                        System.out.println(points.get(i).toString()+ "  " + i);
                         Point p1 = new Point(points.get(i).getX(), points.get(i).getY());
                         Point p2 = new Point(points.get(i+1).getX(), points.get(i+1).getY());
+
                         drawDDALine(p1,p2, 0xFFFFFF);
                     }
-                    if(points.size()>1)
-                        {
-                           drawDDALine(points.get(points.size()-1), points.get(0), 0xFFFFFF);
-                        }
-                System.out.println("____________");
             }
 
 
