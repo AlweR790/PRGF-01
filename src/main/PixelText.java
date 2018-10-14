@@ -146,8 +146,7 @@ public class PixelText
             }
         public static void main(String[] args)
             {
-                //SwingUtilities.invokeLater(PixelText::new);
-				new PixelText();
+                SwingUtilities.invokeLater(PixelText::new);
             }
         public void drawDonePolygon()
             {
