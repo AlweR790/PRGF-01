@@ -2,13 +2,20 @@ package main;
 
 public class Point
     {
-        private float X, Y;
+        private float X, Y, brightness;
 
         public Point(float x, float y)
             {
                 X = x;
                 Y = y;
             }
+        public Point(float x, float y, float brightness)
+            {
+                X = x;
+                Y = y;
+                this.brightness = brightness;
+            }
+
         public Point(int x, int y)
             {
                 X = (float)x;
@@ -51,5 +58,15 @@ public class Point
                         "X=" + X +
                         ", Y=" + Y +
                         '}';
+            }
+
+        public float getBrightness()
+            {
+                return brightness;
+            }
+
+        public void setBrightness(float brightness)
+            {
+                this.brightness = brightness;
             }
     }

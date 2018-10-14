@@ -15,17 +15,17 @@ public class PixelText
         private JFrame window;
         private Canvas canvas;
         private BufferedImage img;
+        private BufferedImage img2;
         private Render render;
         private boolean activeIrr = false;
         private boolean activeReg = false;
+        private boolean activeRegDraw = false;
         private List<Point> points = new ArrayList<>();
         private Point center;
         private Point radius;
         private Point sides;
         private int clicks;
-      //  private List<Point> regularPoly = new ArrayList<>();
-        private boolean isFirst = true;
-
+        private int sidesN;
         public PixelText()
             {
                 window = new JFrame();
@@ -33,13 +33,12 @@ public class PixelText
                 window.setSize(1600, 900);
                 window.setTitle("PRGF Cviceni");
                 window.setLocationRelativeTo(null);
-                img = new BufferedImage(1601, 901, BufferedImage.TYPE_INT_RGB);
+                img = new BufferedImage(1600, 900, BufferedImage.TYPE_INT_RGB);
                 canvas = new Canvas();
                 render = new Render(img, canvas);
                 window.add(canvas);
                 window.setVisible(true);
-                System.out.println("OK");
-
+                render.drawXiaolinWuLine(new Point(100,200),new Point(800,250));
                 canvas.addMouseListener(new MouseAdapter()
                             {
                                 @Override
@@ -47,6 +46,7 @@ public class PixelText
 									{
 									    if(SwingUtilities.isLeftMouseButton(mouseEvent))
                                             {
+                                                render.clear();
                                                 Point p = new Point(mouseEvent.getX(), mouseEvent.getY());
                                                 points.add(p);
                                                 render.drawPolygon(points);
@@ -56,6 +56,7 @@ public class PixelText
                                                         render.drawLine(points.get(0), points.get(points.size() - 1), 0xFFFFFF);
                                                     }
                                                 activeIrr = true;
+                                                render.calcPolygon(center, radius,sidesN);
                                             }
                                         if(SwingUtilities.isRightMouseButton(mouseEvent))
                                             {
@@ -69,9 +70,11 @@ public class PixelText
                                                         case 1:
                                                             radius = new Point(mouseEvent.getX(), mouseEvent.getY());
                                                             activeReg = false;
+                                                            activeRegDraw = true;
                                                         break;
                                                         case 2:
                                                             sides = new Point(mouseEvent.getX(), mouseEvent.getY());
+                                                            activeRegDraw = false;
                                                             break;
                                                         default:break;
                                                     }
@@ -86,23 +89,34 @@ public class PixelText
                         @Override
                         public void mouseMoved(MouseEvent e)
                             {
+                                render.clear();
+                                render.drawXiaolinWuLine(new Point(500,500), new Point(e.getX(), e.getY()));
+                                System.out.println(e.getX() +" : " + e.getY());
                                 if(activeIrr)
                                     {
+                                        render.clear();
                                         drawDonePolygon();
+                                        render.calcPolygon(center, radius,sidesN);
                                         render.drawLine(new Point(e.getX(), e.getY()), points.get(points.size()-1), 0xFF0000);
+                                        render.drawLine(new Point(e.getX(), e.getY()), points.get(0),  0xFF05000);
                                     }
                                 if(activeReg)
                                     {
+                                        render.clear();
                                         drawDonePolygon();
                                         render.drawDDALine(center, new Point(e.getX(), e.getY()),0xFF0000);
                                     }
+								if (activeRegDraw)
+									{
+                                        render.clear();
+										drawDonePolygon();
+										Point p = new Point(e.getX(), e.getY());
+										sidesN = 3+ (int)p.getY() / 35;
+										render.calcPolygon(center, radius,sidesN);
+									}
                             }
 
-                        @Override
-                        public void mouseReleased(MouseEvent e)
-                            {
 
-                            }
                     });
                 canvas.addKeyListener(new KeyAdapter() {
                     @Override
@@ -113,6 +127,19 @@ public class PixelText
                                     activeIrr =false;
                                     drawDonePolygon();
                                 }
+							if(e.getKeyCode() == 127)
+								{
+									render.clear();
+									points = new ArrayList<>();
+									center = new Point();
+									radius = new Point();
+									sides = new Point();
+									sidesN = 0;
+                                    clicks = 0;
+                                    activeIrr = false;
+                                    activeReg = false;
+                                    activeRegDraw = false;
+								}
 
                         }
                 });
