@@ -33,7 +33,7 @@ public class PixelText
                 window = new JFrame();
                 window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 window.setSize(1600, 900);
-                window.setTitle("PRGF Cviceni");
+                window.setTitle("PRGF Ukol 1");
                 window.setLocationRelativeTo(null);
                 img = new BufferedImage(1600, 900, BufferedImage.TYPE_INT_RGB);
                 canvas = new Canvas();
@@ -79,6 +79,7 @@ public class PixelText
                                                     break;
                                                 case 2:
                                                     sides = new Point(mouseEvent.getX(), mouseEvent.getY());
+                                                    sidesN =  3 + (int) sides.getY() / 35;
                                                     activeRegDraw = false;
                                                     done = true;
                                                     break;
@@ -165,8 +166,6 @@ public class PixelText
                                         render.clear();
                                         drawDonePolygon();
                                     }
-                                System.out.println(e.getKeyCode());
-
                             }
                     });
             }

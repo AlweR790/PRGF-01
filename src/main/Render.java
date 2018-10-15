@@ -134,7 +134,7 @@ public class Render
 				if(antiAliasing)
 				    drawXiaolinWuLine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0));
 				else
-				    drawLine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0), 0xFFFFFF);
+				    drawDDALine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0), 0xFFFFFF);
 			}
 
 		public float distance(Point center, Point radius)
@@ -148,7 +148,7 @@ public class Render
 				int x;
 				float k, q, y;
 				k = (end.getY() - start.getY()) / (end.getX() - start.getX());
-				if (Math.abs(k) >= 1)
+				if (abs(k) >= 1)
 					{
 						float x1;
 						q = 1 / k;
