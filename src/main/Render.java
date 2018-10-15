@@ -43,7 +43,7 @@ public class Render
 
 		public void drawPixelBrightness(int x, int y, float bright)
 			{
-				img.setRGB(x, y, Color.HSBtoRGB(0, 0, 1-bright));
+				img.setRGB(x, y, Color.HSBtoRGB(0, 0, bright));
 			}
 
 		public void drawLine(Point first, Point second, int color)
@@ -96,23 +96,25 @@ public class Render
 		public void clear()
 			{
 				Graphics g = img.getGraphics();
-				g.setColor(Color.BLACK);
+				g.setColor(Color.WHITE);
 				g.clearRect(0, 0, 1600, 900);
 			}
 
 
-		public void drawPolygon(List<Point> points)
+		public void drawPolygon(List<Point> points, boolean antiAliasing)
 			{
 				for (int i = 0; i < points.size() - 1; i++)
 					{
 						Point p1 = new Point(points.get(i).getX(), points.get(i).getY());
 						Point p2 = new Point(points.get(i + 1).getX(), points.get(i + 1).getY());
-
-						drawDDALine(p1, p2, 0xFFFFFF);
+                        if(antiAliasing)
+                            drawXiaolinWuLine(p1, p2);
+                        else
+						    drawDDALine(p1, p2, 0xFFFFFF);
 					}
 			}
 
-		public void calcPolygon(Point center, Point radius, int sidesN)
+		public void calcPolygon(Point center, Point radius, int sidesN, boolean antiAliasing)
 			{
 				List<Point> poylgonPoints = new ArrayList<>();
 				float circleRadius = distance(center, radius);
@@ -125,8 +127,11 @@ public class Render
 						p.setY(center.getY() + (float) Math.sin(startAngle + angle * i) * circleRadius);
 						poylgonPoints.add(p);
 					}
-				drawPolygon(poylgonPoints);
-				drawDDALine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0), 0xFFFFFF);
+				drawPolygon(poylgonPoints, antiAliasing);
+				if(antiAliasing)
+				    drawXiaolinWuLine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0));
+				else
+				    drawLine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0), 0xFFFFFF);
 			}
 
 		public float distance(Point center, Point radius)
@@ -191,8 +196,8 @@ public class Render
 
 		public void drawXiaolinWuLine(Point start, Point end)
 			{
-				float x0, x1, y0, y1, dx, dy, grad, xEnding, yEnding, xGap, xPixel1, yPixel1, xPixel2, yPixel2, interY;
 
+			    float x0, x1, y0, y1, dx, dy, grad;
 				x0 = start.getX();
 				x1 = end.getX();
 
@@ -218,65 +223,28 @@ public class Render
 						x1 = temp;
 
 						temp = y0;
+
 						y0 = y1;
 						y1 = temp;
 					}
 				dx = x1 - x0;
 				dy = y1 - y0;
 				grad = dy/dx;
-				if (grad == 0)
-					grad = 1;
-
-				xEnding = round(x0);
-				yEnding = y0 + grad * (xEnding - x0);
-				xGap = rfpart(x0 + 0.5f);
-				xPixel1 = xEnding;
-				yPixel1 = ipart(yEnding);
-				if(steep)
-					{
-						drawPixelBrightness((int)yPixel1, (int)xPixel1, rfpart(yEnding)* xGap);
-						drawPixelBrightness((int)yPixel1+1, (int)xPixel1, fpart(yEnding)* xGap);
-					}
-				else
-					{
-						drawPixelBrightness((int)xPixel1,(int) yPixel1, rfpart(yEnding)* xGap);
-						drawPixelBrightness((int) xPixel1, (int) yPixel1 + 1, fpart(yEnding)*xGap );
-					}
-				interY = yEnding + grad;
-
-				xEnding = round(x1);
-				yEnding = y1 + grad * (xEnding - x1);
-				xGap = fpart(x1 + 0.5f);
-				xPixel2 = xEnding;
-				yPixel2 = ipart(yEnding);
-
-				if(steep)
-					{
-						drawPixelBrightness((int)yPixel2, (int) xPixel2, rfpart(yEnding)*xGap );
-						drawPixelBrightness((int)yPixel2, (int) xPixel2+1, fpart(yEnding)*xGap );
-					}
-				else
-					{
-						drawPixelBrightness((int) xPixel2, (int) yPixel2, rfpart(yEnding)*xGap);
-						drawPixelBrightness((int) xPixel2, (int) yPixel2+1, fpart(xEnding)*xGap);
-					}
-
-				for(float x = xPixel1 + 1; x <= xPixel2 -1; x++)
-					{
-						if(steep)
-							{
-								drawPixelBrightness(ipart(interY),(int) x, rfpart(interY));
-								drawPixelBrightness(ipart(interY)+1, (int)x, fpart(interY));
-							}
-						else
-							{
-								drawPixelBrightness((int)x, ipart(interY), rfpart(interY));
-								drawPixelBrightness((int)x, ipart(interY), rfpart(interY));
-							}
-						interY+= grad;
-					}
-
-
+				float y = y0 + grad;
+                for(float x = x0; x <= x1; x++ )
+                    {
+                        if(steep)
+                            {
+                                drawPixelBrightness((int) y,(int) x, 1-(y-(int)y));
+                                drawPixelBrightness((int) y + 1, (int) x, y-(int)y);
+                            }
+                        else
+                            {
+                                drawPixelBrightness((int) x,(int) y, 1-(y-(int)y));
+                                drawPixelBrightness((int) x, (int) y+1, y-(int)y);
+                            }
+                        y += grad;
+                    }
 			}
 
 
