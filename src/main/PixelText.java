@@ -13,6 +13,8 @@ import java.util.List;
 public class PixelText
     {
         private JFrame window;
+        private static final int width = 1900;
+        private static final int height = 1000;
         private Canvas canvas;
         private BufferedImage img;
         private Render render;
@@ -27,19 +29,25 @@ public class PixelText
         private Point sides;
         private int clicks;
         private int sidesN;
+        private JLabel statusBar;
 
         public PixelText()
             {
                 window = new JFrame();
                 window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                window.setSize(1600, 900);
+                window.setSize(width, height);
                 window.setTitle("PRGF Ukol 1");
                 window.setLocationRelativeTo(null);
-                img = new BufferedImage(1600, 900, BufferedImage.TYPE_INT_RGB);
+                img = new BufferedImage(window.getWidth(), window.getHeight(), BufferedImage.TYPE_INT_RGB);
                 canvas = new Canvas();
                 render = new Render(img, canvas);
                 window.add(canvas);
                 window.setVisible(true);
+                window.setResizable(false);
+                statusBar = new JLabel();
+                statusBar.setOpaque(false);
+                statusBar.setText("Antialiasing: " + antiAliasing + "  Press SPACE to switch, ESC to stop drawing and DEL to start again, RMB for Irregular Polynome, LMB for Regulat Polynome");
+                window.add(statusBar, BorderLayout.SOUTH);
                 canvas.addMouseListener(new MouseAdapter()
                     {
                         @Override
@@ -50,18 +58,18 @@ public class PixelText
                                         render.clear();
                                         Point p = new Point(mouseEvent.getX(), mouseEvent.getY());
                                         points.add(p);
-                                        render.drawPolygon(points, antiAliasing);
+                                        render.drawPolygon(points, antiAliasing, 0, 0xFFFFFF);
                                         render.drawPixel((int) p.getX(), (int) p.getY(), 0xFFFFFF);
                                         if (points.size() > 2)
                                             {
                                                 if (antiAliasing)
-                                                    render.drawXiaolinWuLine(points.get(0), points.get(points.size() - 1));
+                                                    render.drawXiaolinWuLine(points.get(0), points.get(points.size() - 1), 0);
                                                 else
                                                     render.drawLine(points.get(0), points.get(points.size() - 1), 0xFFFFFF);
                                             }
                                         activeIrr = true;
                                         if (done)
-                                            render.calcPolygon(center, radius, sidesN, antiAliasing);
+                                            render.calcPolygon(center, radius, sidesN, antiAliasing,0, 0xFFFFFF);
                                     }
                                 if (SwingUtilities.isRightMouseButton(mouseEvent))
                                     {
@@ -78,10 +86,12 @@ public class PixelText
                                                     activeRegDraw = true;
                                                     break;
                                                 case 2:
+                                                    activeRegDraw = false;
+                                                    render.clear();
                                                     sides = new Point(mouseEvent.getX(), mouseEvent.getY());
                                                     sidesN =  3 + (int) sides.getY() / 35;
-                                                    activeRegDraw = false;
                                                     done = true;
+                                                    drawDonePolygon();
                                                     break;
                                                 default:
                                                     break;
@@ -102,26 +112,28 @@ public class PixelText
                                         render.clear();
                                         drawDonePolygon();
                                         if (done)
-                                            render.calcPolygon(center, radius, sidesN, antiAliasing);
+                                            render.calcPolygon(center, radius, sidesN, antiAliasing,0, 0xFFFFFF);
                                         if (antiAliasing)
                                             {
-                                                render.drawXiaolinWuLine(new Point(e.getX(), e.getY()), points.get(points.size() - 1));
-                                                render.drawXiaolinWuLine(new Point(e.getX(), e.getY()), points.get(0));
+                                                render.drawXiaolinWuLine(new Point(e.getX(), e.getY()), points.get(points.size() - 1),1);
+                                                render.drawXiaolinWuLine(new Point(e.getX(), e.getY()), points.get(0),1);
                                             }
                                         else
                                             {
                                                 render.drawLine(new Point(e.getX(), e.getY()), points.get(points.size() - 1), 0xFF0000);
-                                                render.drawLine(new Point(e.getX(), e.getY()), points.get(0), 0xFF05000);
+                                                render.drawLine(new Point(e.getX(), e.getY()), points.get(0), 0xFF0000);
                                             }
                                     }
                                 if (activeReg)
                                     {
                                         render.clear();
                                         drawDonePolygon();
+                                        render.calcPolygon(center, new Point(e.getX(), e.getY()), 3, antiAliasing,1, 0xFF0000);
                                         if (antiAliasing)
-                                            render.drawXiaolinWuLine(center, new Point(e.getX(), e.getY()));
+                                            render.drawXiaolinWuLine(center,new Point(e.getX(), e.getY()), 1 );
                                         else
-                                            render.drawDDALine(center, new Point(e.getX(), e.getY()), 0xFF0000);
+                                            render.drawDDALine(center,new Point(e.getX(), e.getY()), 0xFF0000);
+
                                     }
                                 if (activeRegDraw)
                                     {
@@ -129,7 +141,7 @@ public class PixelText
                                         drawDonePolygon();
                                         Point p = new Point(e.getX(), e.getY());
                                         sidesN = 3 + (int) p.getY() / 35;
-                                        render.calcPolygon(center, radius, sidesN, antiAliasing);
+                                        render.calcPolygon(center, radius, sidesN, antiAliasing,1, 0xFF0000);
                                     }
                             }
                     });
@@ -141,9 +153,17 @@ public class PixelText
                                 if (e.getKeyCode() == 27)
                                     {
                                         activeIrr = false;
+                                        activeReg = false;
+                                        activeRegDraw = false;
+
                                         render.clear();
                                         if (done)
-                                            render.calcPolygon(center, radius, sidesN, antiAliasing);
+                                            render.calcPolygon(center, radius, sidesN, antiAliasing,0, 0xFFFFFF);
+                                        else
+                                            {
+                                                center = null; radius = null; clicks = 0;
+                                            }
+
                                         drawDonePolygon();
                                     }
                                 if (e.getKeyCode() == 127)
@@ -165,6 +185,7 @@ public class PixelText
                                         antiAliasing = !antiAliasing;
                                         render.clear();
                                         drawDonePolygon();
+                                        statusBar.setText("Antialiasing: " + antiAliasing + "  Press SPACE to switch, ESC to stop drawing and DEL to start again, RMB for Irregular Polynome, LMB for Regulat Polynome");
                                     }
                             }
                     });
@@ -178,12 +199,12 @@ public class PixelText
         public void drawDonePolygon()
             {
                 if (done)
-                    render.calcPolygon(center, radius, sidesN, antiAliasing);
-                render.drawPolygon(points, antiAliasing);
+                    render.calcPolygon(center, radius, sidesN, antiAliasing,0, 0xFFFFFF);
+                render.drawPolygon(points, antiAliasing,0, 0xFFFFFF);
                 if (points.size() > 2)
                     {
                         if (antiAliasing)
-                            render.drawXiaolinWuLine(points.get(0), points.get(points.size() - 1));
+                            render.drawXiaolinWuLine(points.get(0), points.get(points.size() - 1),0);
                         else
                             render.drawLine(points.get(0), points.get(points.size() - 1), 0xFFFFFF);
                     }
