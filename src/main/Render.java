@@ -9,13 +9,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.floor;
+
 
 public class Render
 	{
 		private BufferedImage img;
 		private Canvas canvas;
 		private static final int FPS = 1000 / 100;
+
 
 		public Render(BufferedImage img, Canvas canvas)
 			{
@@ -44,6 +45,7 @@ public class Render
 		public void drawPixelBrightness(int x, int y, float bright)
 			{
 				img.setRGB(x, y, Color.HSBtoRGB(0, 0, bright));
+
 			}
 
 		public void drawLine(Point first, Point second, int color)
@@ -107,6 +109,7 @@ public class Render
 					{
 						Point p1 = new Point(points.get(i).getX(), points.get(i).getY());
 						Point p2 = new Point(points.get(i + 1).getX(), points.get(i + 1).getY());
+
                         if(antiAliasing)
                             drawXiaolinWuLine(p1, p2);
                         else
@@ -231,7 +234,7 @@ public class Render
 				dy = y1 - y0;
 				grad = dy/dx;
 				float y = y0 + grad;
-                for(float x = x0; x <= x1; x++ )
+                for(float x = x0+1; x <= x1+1; x++ )
                     {
                         if(steep)
                             {
@@ -246,27 +249,4 @@ public class Render
                         y += grad;
                     }
 			}
-
-
-		public int ipart(float x)
-			{
-				return (int) floor(x);
-			}
-
-		public float round(float x)
-			{
-				return ipart(x + 0.5f);
-			}
-
-		public float fpart(float x)
-			{
-				return x - (float) floor(x);
-			}
-
-		public float rfpart(float x)
-			{
-				return 1 - fpart(x);
-			}
-
-
 	}

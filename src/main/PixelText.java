@@ -15,7 +15,6 @@ public class PixelText
         private JFrame window;
         private Canvas canvas;
         private BufferedImage img;
-        private BufferedImage img2;
         private Render render;
         private boolean activeIrr = false;
         private boolean activeReg = false;
@@ -41,7 +40,6 @@ public class PixelText
                 render = new Render(img, canvas);
                 window.add(canvas);
                 window.setVisible(true);
-                render.drawXiaolinWuLine(new Point(800, 200), new Point(100, 300));
                 canvas.addMouseListener(new MouseAdapter()
                     {
                         @Override
@@ -133,8 +131,6 @@ public class PixelText
                                         render.calcPolygon(center, radius, sidesN, antiAliasing);
                                     }
                             }
-
-
                     });
                 canvas.addKeyListener(new KeyAdapter()
                     {
@@ -166,6 +162,7 @@ public class PixelText
                                 if (e.getKeyCode() == 32)
                                     {
                                         antiAliasing = !antiAliasing;
+                                        render.clear();
                                         drawDonePolygon();
                                     }
                                 System.out.println(e.getKeyCode());
@@ -181,6 +178,8 @@ public class PixelText
 
         public void drawDonePolygon()
             {
+                if (done)
+                    render.calcPolygon(center, radius, sidesN, antiAliasing);
                 render.drawPolygon(points, antiAliasing);
                 if (points.size() > 2)
                     {
