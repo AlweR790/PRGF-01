@@ -1,4 +1,4 @@
-package main;
+package main.geometryObjects;
 
 public class Point
     {
@@ -9,6 +9,7 @@ public class Point
                 X = x;
                 Y = y;
             }
+
         public Point(float x, float y, float brightness)
             {
                 X = x;
@@ -18,8 +19,8 @@ public class Point
 
         public Point(int x, int y)
             {
-                X = (float)x;
-                Y = (float)y;
+                X = (float) x;
+                Y = (float) y;
             }
 
         public Point()
@@ -46,6 +47,7 @@ public class Point
             {
                 Y = y;
             }
+
         public boolean equals(Point p2)
             {
                 return (X == p2.getX() && Y == p2.getY());
