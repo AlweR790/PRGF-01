@@ -1,8 +1,8 @@
-package main.geometryObjects;
+package main.geometry;
 
 public class Point
     {
-        private float X, Y, brightness;
+        public float X, Y;
 
         public Point(float x, float y)
             {
@@ -10,12 +10,6 @@ public class Point
                 Y = y;
             }
 
-        public Point(float x, float y, float brightness)
-            {
-                X = x;
-                Y = y;
-                this.brightness = brightness;
-            }
 
         public Point(int x, int y)
             {
@@ -23,10 +17,6 @@ public class Point
                 Y = (float) y;
             }
 
-        public Point()
-            {
-
-            }
 
         public float getX()
             {
@@ -60,15 +50,5 @@ public class Point
                         "X=" + X +
                         ", Y=" + Y +
                         '}';
-            }
-
-        public float getBrightness()
-            {
-                return brightness;
-            }
-
-        public void setBrightness(float brightness)
-            {
-                this.brightness = brightness;
             }
     }

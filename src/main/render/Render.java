@@ -1,8 +1,9 @@
 package main.render;
 
 
-import main.FIll.SeedFill;
-import main.geometryObjects.Point;
+import main.geometry.Line;
+import main.geometry.Point;
+import main.image.IPattern;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,18 +17,21 @@ import static java.lang.Math.abs;
 
 public class Render
     {
+
+        private static final Render instance = new Render(); //Singleton
         private BufferedImage img;
         private Canvas canvas;
         private static final int FPS = 1000 / 100;
-        public SeedFill seedFill= new SeedFill();
 
 
-
-        public Render(BufferedImage img, Canvas canvas)
+        private Render()
             {
-                this.canvas = canvas;
+            }
+
+        public void inicialize(BufferedImage img, Canvas canvas)
+            {
                 this.img = img;
-                seedFill.setBufferedImage(img);
+                this.canvas = canvas;
                 setLoop();
             }
 
@@ -40,11 +44,11 @@ public class Render
                             {
                                 try
                                     {
-                                        canvas.getGraphics().drawImage(img, 0, 0, null);
+                                        canvas.getGraphics().drawImage(img, 0, 0, null);   //Po založení projectu na Linuxu se občas bugne na Win, proto try chatch
                                     }
                                 catch (Exception e)
                                     {
-
+                                        e.printStackTrace();
                                     }
                             }
                     }, 100, FPS);
@@ -56,14 +60,14 @@ public class Render
                     img.setRGB(x, y, color);
             }
 
-        public void drawPixelBrightness(int x, int y, float bright, float saturation)
+        private void drawPixelBrightness(int x, int y, float bright, float saturation)
             {
                 if (x > 0 && y > 0 && x < canvas.getWidth() && y < canvas.getHeight())
                     img.setRGB(x, y, Color.HSBtoRGB(0, saturation, bright));
 
             }
 
-        public void drawLine(Point first, Point second, int color)
+        public void drawLine(Point first, Point second, int color, boolean patternOn, IPattern pattern)
             {
                 if (first.equals(second))
                     {
@@ -88,7 +92,10 @@ public class Render
                                 float x = k * y + q;
                                 if (x < img.getWidth() && x > 0 && y > 0 && y < img.getHeight())
                                     {
-                                        drawPixel(Math.round(x), (int) y, color);
+                                        if (patternOn)
+                                            drawPixel(Math.round(x), (int) y, pattern.getbImage().getRGB((int) x % pattern.getLengthX(), (int) y % pattern.getLengthX()));
+                                        else
+                                            drawPixel(Math.round(x), (int) y, color);
                                     }
                             }
                     }
@@ -105,7 +112,11 @@ public class Render
                                 float y = k * x + q;
                                 if (x < img.getWidth() && x > 0 && y > 0 && y < img.getHeight())
                                     {
-                                        drawPixel((int) x, Math.round(y), color);
+
+                                        if (patternOn)
+                                            drawPixel(Math.round(x), (int) y, pattern.getbImage().getRGB((int) x % pattern.getLengthX(), (int) y % pattern.getLengthX()));
+                                        else
+                                            drawPixel(Math.round(x), (int) y, color);
                                     }
                             }
                     }
@@ -119,9 +130,10 @@ public class Render
             }
 
 
-
         public void drawPolygon(List<Point> points, boolean antiAliasing, float saturation, int color)
             {
+                if (points.isEmpty())
+                    return;
                 for (int i = 0; i < points.size() - 1; i++)
                     {
                         Point p1 = new Point(points.get(i).getX(), points.get(i).getY());
@@ -132,9 +144,15 @@ public class Render
                         else
                             drawDDALine(p1, p2, color);
                     }
+                if (antiAliasing)
+                    drawXiaolinWuLine(points.get(0), points.get(points.size() - 1), saturation);
+                else
+                    drawLine(points.get(0), points.get(points.size() - 1), color, false, null);
+
+
             }
 
-        public void calcPolygon(Point center, Point radius, int sidesN, boolean antiAliasing, float saturation, int color)
+      /*  public void calcPolygon(Point center, Point radius, int sidesN, boolean antiAliasing, float saturation, int color)
             {
                 List<Point> poylgonPoints = new ArrayList<>();
                 float circleRadius = distance(center, radius);
@@ -154,13 +172,14 @@ public class Render
                     drawDDALine(poylgonPoints.get(poylgonPoints.size() - 1), poylgonPoints.get(0), color);
             }
 
-        public float distance(Point center, Point radius)
+
+        private float distance(Point center, Point radius)
             {
                 return (float) Math.sqrt(Math.pow((radius.getX() - center.getX()), 2) + Math.pow((radius.getY() - center.getY()), 2));
             }
+*/
 
-
-        public void drawDDALine(Point start, Point end, int color)
+        private void drawDDALine(Point start, Point end, int color)
             {
                 int x;
                 float k, q, y;
@@ -267,4 +286,49 @@ public class Render
                         y += grad;
                     }
             }
+
+        public List<Point> clip(List<Point> polygonPoints, List<Point> clipPoints)
+            {
+                List<Point> input;
+                List<Line> edges = new ArrayList<>();
+
+                for (int i = 0; i < clipPoints.size(); i++)
+                    {
+                        edges.add(new Line(clipPoints.get(i), clipPoints.get((i + 1) % clipPoints.size())));
+                    }
+
+                for (Line edge : edges)
+                    {
+
+                        input = new ArrayList<>(polygonPoints);
+                        polygonPoints.clear();
+                        if (!input.isEmpty())
+                            {
+                                Point v1 = input.get(input.size() - 1);
+                                for (Point v2 : input)
+                                    {
+                                        if (edge.isInside(v2))
+                                            {
+                                                if (!edge.isInside(v1))
+                                                    polygonPoints.add(edge.intersection(v1, v2));
+                                                polygonPoints.add(v2);
+                                            }
+                                        else
+                                            {
+                                                if (edge.isInside(v1))
+                                                    polygonPoints.add(edge.intersection(v1, v2));
+                                            }
+                                        v1 = v2;
+                                    }
+                            }
+                    }
+
+                return polygonPoints;
+            }
+
+        public static Render getInstance()
+            {
+                return instance;
+            }
+
     }
